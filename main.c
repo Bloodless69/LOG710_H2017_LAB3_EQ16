@@ -15,8 +15,21 @@ typedef struct node {
 	struct node *next;
 } node;
 
+node *root = NULL;
+
+void initmem(int memSize) {
+	struct bloc *bloc;
+	bloc->size = memSize;
+	bloc->offset = 0;
+	bloc>data = malloc(sizeof(memSize));
+
+	root = malloc(sizeof(node));
+	root->value = bloc;
+	root->previous = NULL;
+	root->next = NULL;
+}
 
 void main() {
-	node *root = malloc(sizeof(node));
+	initmem(500);
 }
 
