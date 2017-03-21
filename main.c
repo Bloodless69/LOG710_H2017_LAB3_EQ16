@@ -21,7 +21,7 @@ void initmem(int memSize) {
 	struct bloc *bloc;
 	bloc->size = memSize;
 	bloc->offset = 0;
-	bloc>data = malloc(sizeof(memSize));
+	bloc->data = NULL;
 
 	root = malloc(sizeof(node));
 	root->value = bloc;
