@@ -55,7 +55,7 @@ bloc* alloumem(int blocSize) {
             newBlock = malloc(sizeof(bloc));
             newBlock->size = blocSize;
             newBlock->offset = currentNode->offset;
-            newBlock -> malloc(blocSize);
+            newBlock-> malloc(blocSize);
             newNode->value = newBlock;
 
             if(currentNode->value->size > blocSize) {
@@ -93,11 +93,9 @@ void liberemem(node* node, bloc* bloc) {
 		// we only want to empty the node
 		if (hasData(node->previous) && hasData(node->next)) {
 			node->value->data = NULL;
-		}
-
 		// If both previous and next node has no data,
 		// we want to merge current node with the both nodes
-		if (!(hasData(node->previous) && hasData(node->next))) {
+		} else if (!(hasData(node->previous)) && !(hasData(node->next))) {
 			node* leftNode = node->previous->previous;
 			node* rightNode = node->next->next;
 
@@ -107,7 +105,7 @@ void liberemem(node* node, bloc* bloc) {
 
 			bloc* newBloc;
 			newBloc->size = previousBloc->size + currentBloc->size + nextBloc->size;
-			newBloc->offset = node->previous->previous->value->offset;
+			newBloc->offset = previousBloc->offset;
 			newBloc->data = NULL;
 
 			node* newNode;
@@ -117,19 +115,14 @@ void liberemem(node* node, bloc* bloc) {
 
 			leftNode->next = newNode;
 			rightNode->previous = newNode;
-		}
-
 		// If previous node only has no data,
 		// we want to merge current node with the previous one
-		if (!hasData(node->previous) && hasData(node->next)) {
-
-		}
+		} else if (!hasData(node->previous)) {
 
 		// If next node only has no data,
 		// we want to merge current node with the next one
-		if (hasData(node->previous) && !hasData(node->next)) {
+		} else (!hasData(node->next)) {
 
-		}
 		}
 	} else {
 		liberemem(node->next, bloc);
