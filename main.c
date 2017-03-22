@@ -3,6 +3,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+typedef enum { false, true } bool;
+
 typedef struct bloc {
 	int size;
 	int offset;
@@ -13,6 +15,7 @@ typedef struct node {
 	struct bloc *value;
 	struct node *previous;
 	struct node *next;
+	bool isRoot;
 } node;
 
 node *root = NULL;
@@ -27,45 +30,101 @@ void initmem(int memSize) {
 	root->value = bloc;
 	root->previous = NULL;
 	root->next = NULL;
+	root->isRoot = true;
 }
 
-boolean hasNext(node* node) {
+bool hasNext(node* node) {
 	return (node->next != NULL);
 }
 
-void liberemem(bloc* bloc) {
-	node* currentNode = root;
-
-	// If we are trying to free the root, 
-	// we need to check the next node only
-	if (currentNode->value == bloc)
-	{
-		// Checking next node
-		if (hasNext(currentNode)) {
-			// Root offset
-			currentOffset = currentNode->value->offset;
-			// Next node offset
-			nextOffset = currentNode->next->value->offset;
-		} else {
-			currentNode->value->data = NULL;
-		}
-	// We are tying to free another node in the linked list	
-	} else {
-		while (hasNext(currentNode)) {
-			// Switching to next node
-			currentNode = currentNode->next;
-		}
-	}
+bool hasData(node* node) {
+	return (node->value->data != NULL);
 }
 
-void liberemem2(bloc* bloc) {
-	node* currentNode = root;
+bloc* alloumem(int blocSize) {
+    node *currentNode = root;
 
-	while (hasNext(currentNode)) {
-			// Switching to next node
-			currentNode = currentNode->next;
+    bloc *newBlock = NULL;
+    while(newBlock == NULL) {
+        if(currentNode->value->data == NULL && currentNode->value->size >= blocSize) {
+            node *newNode = malloc(sizeof(node));
+            if(currentNode->previous)
+                currentNode->previous->next = newNode;
+
+            newNode->previous = currentNode->previous;
+
+            newBlock = malloc(sizeof(bloc));
+            newBlock->size = blocSize;
+            newBlock->offset = currentNode->offset;
+            newBlock -> malloc(blocSize);
+            newNode->value = newBlock;
+
+            if(currentNode->value->size > blocSize) {
+                node *newEmptyNode = malloc(sizeof(node));
+                newEmptyNode->previous = newNode;
+                if(currentNode->next)
+                    newEmptyNode->next = currentNode->next;
 
 
+                struct bloc *newEmptyBloc;
+                newEmptyBloc->size = currentNode->block->size - blocSize;
+                newEmptyBloc->offset = currentNode->value->offset + blocSize;
+                newEmptyBloc->data = NULL;
+
+                newEmptyNode->value = newEmptyBloc;
+                newNode->next = newEmptyNode;
+            } else {
+                if(currentNode->next)
+                    newNode->next = currentNode->next;
+            }
+        } else {
+            if(currentNode->next == NULL)
+                break;
+            currentNode = currentNode->next;
+        }
+    }
+    return newBlock;
+}
+
+void liberemem(node* node, bloc* bloc) {
+	
+	if (node->value == bloc)
+	{
+		// Checking if current node is root
+		if (node->isRoot) {
+			if (hasNext(node)) {
+
+			} else {
+				node->value->data = NULL;
+			}
+		// Current node is not the root	
+		} else {
+			// If both previous and next node has data,
+			// we only want to empty the node
+			if (hasData(node->previous) && hasData(node->next)) {
+				node->value->data = NULL;
+			}
+
+			// If both previous and next node has no data,
+			// we want to merge current node with the both nodes
+			if (hasData(node->previous) && hasData(node->next)) {
+				node->value->data = NULL;
+			}
+
+			// If previous node only has no data,
+			// we want to merge current node with the previous one
+			if (!hasData(node->previous) && hasData(node->next)) {
+
+			}
+
+			// If next node only has no data,
+			// we want to merge current node with the next one
+			if (hasData(node->previous) && !hasData(node->next)) {
+
+			}
+		}
+	} else {
+		liberemem(node->next, bloc);
 	}
 }
 
