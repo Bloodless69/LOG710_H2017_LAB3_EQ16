@@ -30,7 +30,6 @@ void initmem(int memSize) {
 	root->value = bloc;
 	root->previous = NULL;
 	root->next = NULL;
-	root->isRoot = true;
 }
 
 bool hasNext(node* node) {
@@ -90,38 +89,47 @@ void liberemem(node* node, bloc* bloc) {
 	
 	if (node->value == bloc)
 	{
-		// Checking if current node is root
-		if (node->isRoot) {
-			if (hasNext(node)) {
+		// If both previous and next node has data,
+		// we only want to empty the node
+		if (hasData(node->previous) && hasData(node->next)) {
+			node->value->data = NULL;
+		}
 
-			} else {
-				node->value->data = NULL;
-			}
-		// Current node is not the root	
-		} else {
-			// If both previous and next node has data,
-			// we only want to empty the node
-			if (hasData(node->previous) && hasData(node->next)) {
-				node->value->data = NULL;
-			}
+		// If both previous and next node has no data,
+		// we want to merge current node with the both nodes
+		if (!(hasData(node->previous) && hasData(node->next))) {
+			node* leftNode = node->previous->previous;
+			node* rightNode = node->next->next;
 
-			// If both previous and next node has no data,
-			// we want to merge current node with the both nodes
-			if (hasData(node->previous) && hasData(node->next)) {
-				node->value->data = NULL;
-			}
+			bloc* previousBloc = node->previous->value;
+			bloc* nextBloc = node->next->value;
+			bloc currentBloc = node->value;
 
-			// If previous node only has no data,
-			// we want to merge current node with the previous one
-			if (!hasData(node->previous) && hasData(node->next)) {
+			bloc* newBloc;
+			newBloc->size = previousBloc->size + currentBloc->size + nextBloc->size;
+			newBloc->offset = node->previous->previous->value->offset;
+			newBloc->data = NULL;
 
-			}
+			node* newNode;
+			newNode->value = newBloc;
+			newNode->previous = leftNode;
+			newNode->next = rightNode;
 
-			// If next node only has no data,
-			// we want to merge current node with the next one
-			if (hasData(node->previous) && !hasData(node->next)) {
+			leftNode->next = newNode;
+			rightNode->previous = newNode;
+		}
 
-			}
+		// If previous node only has no data,
+		// we want to merge current node with the previous one
+		if (!hasData(node->previous) && hasData(node->next)) {
+
+		}
+
+		// If next node only has no data,
+		// we want to merge current node with the next one
+		if (hasData(node->previous) && !hasData(node->next)) {
+
+		}
 		}
 	} else {
 		liberemem(node->next, bloc);
