@@ -101,7 +101,7 @@ void liberemem(node* node, bloc* bloc) {
 
 			bloc* previousBloc = node->previous->value;
 			bloc* nextBloc = node->next->value;
-			bloc currentBloc = node->value;
+			bloc* currentBloc = node->value;
 
 			bloc* newBloc;
 			newBloc->size = previousBloc->size + currentBloc->size + nextBloc->size;
@@ -118,11 +118,45 @@ void liberemem(node* node, bloc* bloc) {
 		// If previous node only has no data,
 		// we want to merge current node with the previous one
 		} else if (!hasData(node->previous)) {
+			node* leftNode = node->previous->previous;
+			node* rightNode = node->next;
 
+			bloc* previousBloc = node->previous->value;
+			bloc* currentBloc = node->value;
+
+			bloc* newBloc;
+			newBloc->size = previousBloc->size + currentBloc->size;
+			newBloc->offset = previousBloc->offset;
+			newBloc->data = NULL;
+
+			node* newNode;
+			newNode->value = newBloc;
+			newNode->previous = leftNode;
+			newNode->next = rightNode;
+
+			leftNode->next = newNode;
+			rightNode->previous = newNode;
 		// If next node only has no data,
 		// we want to merge current node with the next one
 		} else (!hasData(node->next)) {
+			node* leftNode = node->previous;
+			node* rightNode = node->next->next;
 
+			bloc* currentBloc = node->value;
+			bloc* nextBloc = node->next->value;
+
+			bloc* newBloc;
+			newBloc->size = currentBloc->size + nextBloc->size;
+			newBloc->offset = leftNode->value->offset;
+			newBloc->data = NULL;
+
+			node* newNode;
+			newNode->value = newBloc;
+			newNode->previous = leftNode;
+			newNode->next = rightNode;
+
+			leftNode->next = newNode;
+			rightNode->previous = newNode;
 		}
 	} else {
 		liberemem(node->next, bloc);
