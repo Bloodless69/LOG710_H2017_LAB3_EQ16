@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
 typedef enum { false, true } bool;
 
@@ -18,10 +16,10 @@ typedef struct node {
 	bool isRoot;
 } node;
 
-node *root = NULL;
+struct node *root = NULL;
 
 void initmem(int memSize) {
-	struct bloc *bloc;
+	struct bloc *bloc = malloc(sizeof(bloc));
 	bloc->size = memSize;
 	bloc->offset = 0;
 	bloc->data = NULL;
@@ -41,37 +39,46 @@ bool hasData(node* node) {
 }
 
 bloc* alloumem(int blocSize) {
-    node *currentNode = root;
+    struct node *currentNode = root;
 
-    bloc *newBlock = NULL;
+    struct bloc *newBlock = NULL;
     while(newBlock == NULL) {
         if(currentNode->value->data == NULL && currentNode->value->size >= blocSize) {
-            node *newNode = malloc(sizeof(node));
-            if(currentNode->previous)
+        	printf("BAM\n");
+            struct node *newNode = malloc(sizeof(node));
+            if(currentNode->previous != NULL) {
                 currentNode->previous->next = newNode;
-
-            newNode->previous = currentNode->previous;
+            	newNode->previous = currentNode->previous;
+            }
 
             newBlock = malloc(sizeof(bloc));
             newBlock->size = blocSize;
-            newBlock->offset = currentNode->offset;
-            newBlock-> malloc(blocSize);
+            newBlock->offset = currentNode->value->offset;
+            newBlock->data = malloc(blocSize);
             newNode->value = newBlock;
 
-            if(currentNode->value->size > blocSize) {
-                node *newEmptyNode = malloc(sizeof(node));
-                newEmptyNode->previous = newNode;
-                if(currentNode->next)
-                    newEmptyNode->next = currentNode->next;
+            printf("BOM\n");
 
+            if(currentNode->value->size > blocSize) {
+                struct node *newEmptyNode = malloc(sizeof(node));
+                newEmptyNode->previous = newNode;
+                if(currentNode->next != NULL) {
+                	printf("IM IN\n");
+                    newEmptyNode->next = currentNode->next;
+                    currentNode->next->previous = newEmptyNode;
+                }
+
+                printf("BIM\n");
 
                 struct bloc *newEmptyBloc;
-                newEmptyBloc->size = currentNode->block->size - blocSize;
+                newEmptyBloc->size = currentNode->value->size - blocSize;
                 newEmptyBloc->offset = currentNode->value->offset + blocSize;
                 newEmptyBloc->data = NULL;
 
                 newEmptyNode->value = newEmptyBloc;
                 newNode->next = newEmptyNode;
+
+                printf("BUM\n");
             } else {
                 if(currentNode->next)
                     newNode->next = currentNode->next;
@@ -96,67 +103,79 @@ void liberemem(node* node, bloc* bloc) {
 		// If both previous and next node has no data,
 		// we want to merge current node with the both nodes
 		} else if (!(hasData(node->previous)) && !(hasData(node->next))) {
-			node* leftNode = node->previous->previous;
-			node* rightNode = node->next->next;
+			struct node* leftNode = node->previous->previous;
+			struct node* rightNode = node->next->next;
 
-			bloc* previousBloc = node->previous->value;
-			bloc* nextBloc = node->next->value;
-			bloc* currentBloc = node->value;
+			struct bloc* previousBloc = node->previous->value;
+			struct bloc* nextBloc = node->next->value;
+			struct bloc* currentBloc = node->value;
 
-			bloc* newBloc;
+			struct bloc* newBloc;
 			newBloc->size = previousBloc->size + currentBloc->size + nextBloc->size;
 			newBloc->offset = previousBloc->offset;
 			newBloc->data = NULL;
 
-			node* newNode;
+			struct node* newNode;
 			newNode->value = newBloc;
 			newNode->previous = leftNode;
 			newNode->next = rightNode;
 
-			leftNode->next = newNode;
-			rightNode->previous = newNode;
+			if (leftNode != NULL) {
+				leftNode->next = newNode;
+			}
+
+			if (rightNode != NULL) {
+				rightNode->previous = newNode;
+			}
+			
 		// If previous node only has no data,
 		// we want to merge current node with the previous one
 		} else if (!hasData(node->previous)) {
-			node* leftNode = node->previous->previous;
-			node* rightNode = node->next;
+			struct node* leftNode = node->previous->previous;
+			struct node* rightNode = node->next;
 
-			bloc* previousBloc = node->previous->value;
-			bloc* currentBloc = node->value;
+			struct bloc* previousBloc = node->previous->value;
+			struct bloc* currentBloc = node->value;
 
-			bloc* newBloc;
+			struct bloc* newBloc;
 			newBloc->size = previousBloc->size + currentBloc->size;
 			newBloc->offset = previousBloc->offset;
 			newBloc->data = NULL;
 
-			node* newNode;
+			struct node* newNode;
 			newNode->value = newBloc;
 			newNode->previous = leftNode;
 			newNode->next = rightNode;
 
 			leftNode->next = newNode;
+			
+			if (leftNode != NULL) {
+				leftNode->next = newNode;
+			}
 			rightNode->previous = newNode;
 		// If next node only has no data,
 		// we want to merge current node with the next one
-		} else (!hasData(node->next)) {
-			node* leftNode = node->previous;
-			node* rightNode = node->next->next;
+		} else {
+			struct node* leftNode = node->previous;
+			struct node* rightNode = node->next->next;
 
-			bloc* currentBloc = node->value;
-			bloc* nextBloc = node->next->value;
+			struct bloc* currentBloc = node->value;
+			struct bloc* nextBloc = node->next->value;
 
-			bloc* newBloc;
+			struct bloc* newBloc;
 			newBloc->size = currentBloc->size + nextBloc->size;
 			newBloc->offset = leftNode->value->offset;
 			newBloc->data = NULL;
 
-			node* newNode;
+			struct node* newNode;
 			newNode->value = newBloc;
 			newNode->previous = leftNode;
 			newNode->next = rightNode;
 
 			leftNode->next = newNode;
-			rightNode->previous = newNode;
+			if (rightNode != NULL) {
+				rightNode->previous = newNode;
+			}
 		}
 	} else {
 		liberemem(node->next, bloc);
@@ -165,5 +184,8 @@ void liberemem(node* node, bloc* bloc) {
 
 void main() {
 	initmem(500);
+	printf("Patate\n");
+	alloumem(250);
+	printf("Bob\n");
 }
 
