@@ -38,54 +38,48 @@ bool hasData(node* node) {
 	return (node->value->data != NULL);
 }
 
+bool exist(node* node) {
+	return node != NULL;
+}
+
 bloc* alloumem(int blocSize) {
     struct node *currentNode = root;
-
     struct bloc *newBlock = NULL;
     while(newBlock == NULL) {
         if(currentNode->value->data == NULL && currentNode->value->size >= blocSize) {
-        	printf("BAM\n");
-            struct node *newNode = malloc(sizeof(node));
-            if(currentNode->previous != NULL) {
-                currentNode->previous->next = newNode;
-            	newNode->previous = currentNode->previous;
-            }
-
             newBlock = malloc(sizeof(bloc));
             newBlock->size = blocSize;
             newBlock->offset = currentNode->value->offset;
             newBlock->data = malloc(blocSize);
-            newNode->value = newBlock;
-
-            printf("BOM\n");
 
             if(currentNode->value->size > blocSize) {
+            	printf("LALAL\n");
                 struct node *newEmptyNode = malloc(sizeof(node));
-                newEmptyNode->previous = newNode;
+                newEmptyNode->previous = currentNode;
                 if(currentNode->next != NULL) {
-                	printf("IM IN\n");
+                	printf("TATATATA\n");
                     newEmptyNode->next = currentNode->next;
                     currentNode->next->previous = newEmptyNode;
                 }
-
-                printf("BIM\n");
-
-                struct bloc *newEmptyBloc;
+	printf("LAL11AL\n");
+                struct bloc *newEmptyBloc = malloc(sizeof(bloc));
                 newEmptyBloc->size = currentNode->value->size - blocSize;
                 newEmptyBloc->offset = currentNode->value->offset + blocSize;
                 newEmptyBloc->data = NULL;
-
+	printf("LAL121231211AL\n");
                 newEmptyNode->value = newEmptyBloc;
-                newNode->next = newEmptyNode;
-
-                printf("BUM\n");
+                currentNode->next = newEmptyNode;
+                currentNode->value = newBlock;
+                	printf("1231231231AL\n");
             } else {
-                if(currentNode->next)
-                    newNode->next = currentNode->next;
+                currentNode->value = newBlock;
             }
         } else {
-            if(currentNode->next == NULL)
+            if(currentNode->next == NULL) {
+            	printf("NO MORE MEMORY\n");
                 break;
+            }
+            printf("change!\n");
             currentNode = currentNode->next;
         }
     }
@@ -93,16 +87,13 @@ bloc* alloumem(int blocSize) {
 }
 
 void liberemem(node* node, bloc* bloc) {
-	
+	printf("YOOOO");
 	if (node->value == bloc)
 	{
 		// If both previous and next node has data,
 		// we only want to empty the node
-		if (hasData(node->previous) && hasData(node->next)) {
-			node->value->data = NULL;
-		// If both previous and next node has no data,
-		// we want to merge current node with the both nodes
-		} else if (!(hasData(node->previous)) && !(hasData(node->next))) {
+		if ((exist(node->previous) && !hasData(node->previous)) && (exist(node->next) && !hasData(node->next))) {
+			printf("YOOO!");
 			struct node* leftNode = node->previous->previous;
 			struct node* rightNode = node->next->next;
 
@@ -130,7 +121,7 @@ void liberemem(node* node, bloc* bloc) {
 			
 		// If previous node only has no data,
 		// we want to merge current node with the previous one
-		} else if (!hasData(node->previous)) {
+		} else if (exist(node->previous) && !hasData(node->previous)) {
 			struct node* leftNode = node->previous->previous;
 			struct node* rightNode = node->next;
 
@@ -155,7 +146,8 @@ void liberemem(node* node, bloc* bloc) {
 			rightNode->previous = newNode;
 		// If next node only has no data,
 		// we want to merge current node with the next one
-		} else {
+		} else if(exist(node->next) && !hasData(node->next)){
+				printf("YOOOO111");
 			struct node* leftNode = node->previous;
 			struct node* rightNode = node->next->next;
 
@@ -176,16 +168,49 @@ void liberemem(node* node, bloc* bloc) {
 			if (rightNode != NULL) {
 				rightNode->previous = newNode;
 			}
+		} else {
+			node->value->data = NULL;
 		}
 	} else {
 		liberemem(node->next, bloc);
 	}
 }
 
+void printContent() {
+	printf("hey\n");
+	node *currentNode = root;
+	while(currentNode != NULL) {
+		//printf("IS IN");
+		printf("size: %d\n", currentNode->value->size);
+		printf("offset: %d\n", currentNode->value->offset);
+		printf("haveData: %d\n", currentNode->value->data != NULL);
+
+		if(currentNode->next != NULL && currentNode->next->previous != NULL)
+			printf("GOOD NEXT/PREVIOUS: %p %p \n", currentNode->next, currentNode->next->previous);
+		currentNode = currentNode->next;
+	}
+}
+
 void main() {
 	initmem(500);
 	printf("Patate\n");
-	alloumem(250);
+	bloc *block = alloumem(200);
+//	printf("%d\n", block->size);
+	//bloc *block1 = alloumem(50);
+	//printContent();
+	 /*block = alloumem(50);
+	 printf("%d\n", block->size);
+	 block = alloumem(200);
+	 printf("%d\n", block->size);
+	 block = alloumem(200);
+	 printf("%d\n", block->size);
+	printf("%d\n", block->size);*/
+
+//	liberemem(root, block);
+//	liberemem(root, block1);
+	printf("\n\n\n");
+printContent();
+
 	printf("Bob\n");
 }
 
