@@ -81,101 +81,118 @@ bloc* allocateMemory(int blocSize) {
                 currentNode->value = allocationBloc;
             }
         } else {
+        	//printf("NO ENOUGH DATA");
             if(currentNode->next == NULL) {
-            	printf("No more memory available\n");
+            	//printf("No more memory available\n");
                 break;
             }
-            printf("allouemem - Going to next node\n");
+            //printf("allouemem - Going to next node\n");
             currentNode = currentNode->next;
+            currentBloc = currentNode->value;
         }
     }
     return allocationBloc;
 }
 
 // liberemem()
-void freeMemory(node* node, bloc* bloc) {
-	if (node->value == bloc)
-	{
-		// If both previous and next node has data,
-		// we only want to empty the node
-		if ((exist(node->previous) && !hasData(node->previous)) && (exist(node->next) && !hasData(node->next))) {
-			struct node* leftNode = node->previous->previous;
-			struct node* rightNode = node->next->next;
+void freeMemory(bloc* bloc) {
+	node* node = root;
+	while(true) {
+		if (node->value == bloc)
+		{
+			// If both previous and next node has data,
+			// we only want to empty the node
+			if ((exist(node->previous) && !hasData(node->previous)) && (exist(node->next) && !hasData(node->next))) {
+				struct node* leftNode = node->previous->previous;
+				struct node* rightNode = node->next->next;
 
-			struct bloc* previousBloc = node->previous->value;
-			struct bloc* nextBloc = node->next->value;
-			struct bloc* currentBloc = node->value;
+				struct bloc* previousBloc = node->previous->value;
+				struct bloc* nextBloc = node->next->value;
+				struct bloc* currentBloc = node->value;
 
-			struct bloc* newBloc;
-			newBloc->size = previousBloc->size + currentBloc->size + nextBloc->size;
-			newBloc->offset = previousBloc->offset;
-			newBloc->data = NULL;
+				struct bloc* newBloc = malloc(sizeof(bloc));
+				newBloc->size = previousBloc->size + currentBloc->size + nextBloc->size;
+				newBloc->offset = previousBloc->offset;
+				newBloc->data = NULL;
 
-			struct node* newNode;
-			newNode->value = newBloc;
-			newNode->previous = leftNode;
-			newNode->next = rightNode;
+				struct node* newNode = malloc(sizeof(node));;
+				newNode->value = newBloc;
+				newNode->previous = leftNode;
+				newNode->next = rightNode;
 
-			if (leftNode != NULL) {
-				leftNode->next = newNode;
+				if (leftNode != NULL) {
+					leftNode->next = newNode;
+				}
+
+				if (rightNode != NULL) {
+					rightNode->previous = newNode;
+				}
+				if(node->previous == root)
+					root = newNode;
+			// If previous node only has no data,
+			// we want to merge current node with the previous one
+			} else if (exist(node->previous) && !hasData(node->previous)) {
+				struct node* leftNode = node->previous->previous;
+				struct node* rightNode = node->next;
+
+				struct bloc* previousBloc = node->previous->value;
+				struct bloc* currentBloc = node->value;
+
+				struct bloc* newBloc = malloc(sizeof(bloc));
+				newBloc->size = previousBloc->size + currentBloc->size;
+				newBloc->offset = previousBloc->offset;
+				newBloc->data = NULL;
+
+				struct node* newNode;
+				newNode->value = newBloc;
+				newNode->previous = leftNode;
+				newNode->next = rightNode;
+
+				if (leftNode != NULL) {
+					leftNode->next = newNode;
+				}
+				if(rightNode != NULL) {
+					rightNode->previous = newNode;
+				}
+					root = newNode;
+			// If next node only has no data,
+			// we want to merge current node with the next one
+			} else if(exist(node->next) && !hasData(node->next)) {
+				struct node* leftNode = node->previous;
+				struct node* rightNode = node->next->next;
+
+				struct bloc* currentBloc = node->value;
+				struct bloc* nextBloc = node->next->value;
+
+				struct bloc* newBloc = malloc(sizeof(bloc));
+				struct node* newNode = malloc(sizeof(node));
+				newBloc->size = currentBloc->size + nextBloc->size;
+				newBloc->offset = currentBloc->offset;
+				if(leftNode != NULL) {
+					leftNode->next = newNode;
+				}
+				newBloc->data = NULL;
+				
+				newNode->value = newBloc;
+				newNode->previous = leftNode;
+				newNode->next = rightNode;
+				if (rightNode != NULL) {
+					rightNode->previous = newNode;
+				}
+				if(node == root)
+					root = newNode;
+			} else {
+				node->value->data = NULL;
 			}
-
-			if (rightNode != NULL) {
-				rightNode->previous = newNode;
-			}
-		// If previous node only has no data,
-		// we want to merge current node with the previous one
-		} else if (exist(node->previous) && !hasData(node->previous)) {
-			struct node* leftNode = node->previous->previous;
-			struct node* rightNode = node->next;
-
-			struct bloc* previousBloc = node->previous->value;
-			struct bloc* currentBloc = node->value;
-
-			struct bloc* newBloc;
-			newBloc->size = previousBloc->size + currentBloc->size;
-			newBloc->offset = previousBloc->offset;
-			newBloc->data = NULL;
-
-			struct node* newNode;
-			newNode->value = newBloc;
-			newNode->previous = leftNode;
-			newNode->next = rightNode;
-
-			leftNode->next = newNode;
-			
-			if (leftNode != NULL) {
-				leftNode->next = newNode;
-			}
-			rightNode->previous = newNode;
-		// If next node only has no data,
-		// we want to merge current node with the next one
-		} else if(exist(node->next) && !hasData(node->next)){
-			struct node* leftNode = node->previous;
-			struct node* rightNode = node->next->next;
-
-			struct bloc* currentBloc = node->value;
-			struct bloc* nextBloc = node->next->value;
-
-			struct bloc* newBloc;
-			newBloc->size = currentBloc->size + nextBloc->size;
-			newBloc->offset = leftNode->value->offset;
-			newBloc->data = NULL;
-
-			struct node* newNode;
-			newNode->value = newBloc;
-			newNode->previous = leftNode;
-			newNode->next = rightNode;
-
-			leftNode->next = newNode;
-			if (rightNode != NULL) {
-				rightNode->previous = newNode;
-			}
+			break;
 		} else {
-			node->value->data = NULL;
+			if(node->next) {
+				node = node->next;
+			} else {
+				printf("wasn't able to change free the memory (didn't find the bloc)\n");
+			}
+			
 		}
-	} else {
-		freeMemory(node->next, bloc);
 	}
 }
 
@@ -247,30 +264,41 @@ int nbFreeBlocsSmallerThan(int blocSize) {
 
 // mem_est_alloue(pOctet)
 bool byteIsAllocated(int byte) {
-	bool byteAllocated = false;
-	int currentSize = 0;
 	node *currentNode = root;
 	while(currentNode != NULL) {
 		bloc *currentBloc = currentNode->value;
-		currentSize += currentBloc->size;
-		if (currentSize > byte) {
-			byteAllocated = true;
+		if (currentBloc->offset + currentBloc->size >= byte) {
+			return hasData(currentNode);
 		}
 		else {
 			currentNode = currentNode->next;
 		}
 	}
-	return byteAllocated;
+	printf("didn't find your bloc\n");
+	return false;
 }
 
 void printContent() {
 	int nodeIndex = 0;
 	node *currentNode = root;
 	while(currentNode != NULL) {
+		printf("current adress = %p\n", currentNode);
 		printf("Current node : %d\n", nodeIndex);
 		printf("Size : %d\n", currentNode->value->size);
 		printf("Offset : %d\n", currentNode->value->offset);
 		printf("HasData : %d\n", currentNode->value->data != NULL);
+
+		if(currentNode->previous != NULL) {
+			printf("current adress previous = %p\n", currentNode->previous);
+			printf("current adress previous next = %p\n", currentNode->previous->next);
+		}
+		if(currentNode->next != NULL) {
+			printf("current adress next = %p\n", currentNode->next);
+			printf("current adress next previous = %p\n", currentNode->next->previous);
+		}
+		printf("\n");
+		printf("\n");
+
 		currentNode = currentNode->next;
 		nodeIndex++;
 	}
@@ -278,18 +306,13 @@ void printContent() {
 
 void main() {
 	initMemory(500);
-	bloc *allocationBloc = allocateMemory(200);
+
+	bloc *allocationBloc = allocateMemory(100);
+	bloc *luiDuMilleu = allocateMemory(50);
+	bloc *asas = allocateMemory(100);
+	freeMemory(luiDuMilleu);
+	freeMemory(allocationBloc);
+	freeMemory(asas);
 	printContent();
-	printf("MAIN END\n");
-	//bloc *allocationBloc1 = allocateMemory(50);
-	//allocationBloc = allocateMemory(50);
-	//printf("%d\n", allocationBloc->size);
-	//allocationBloc = allocateMemory(200);
-	//printf("%d\n", allocationBloc->size);
-	//allocationBloc = allocateMemory(200);
-	//printf("%d\n", allocationBloc->size);
-	//printf("%d\n", allocationBloc->size);
-	//freeMemory(root, allocationBloc);
-	//freeMemory(root, allocationBloc1);
 }
 
