@@ -63,9 +63,8 @@ bloc* allocateMemory(int blocSize) {
                 emptyNode->previous = currentNode;
                 if(currentNode->next != NULL) {
                     emptyNode->next = currentNode->next;
-                    node *rightNode = currentNode->next; // NOT SURE, PLEASE CONFIRM
-                    rightNode->previous = emptyNode; 	 // NOT SURE, PLEASE CONFIRM
-                    //currentNode->next->previous = emptyNode;
+                    node *rightNode = currentNode->next;
+                    rightNode->previous = emptyNode;
                 }
 
                 // We need to fill the empty node with an empty bloc of memory
@@ -81,12 +80,9 @@ bloc* allocateMemory(int blocSize) {
                 currentNode->value = allocationBloc;
             }
         } else {
-        	//printf("NO ENOUGH DATA");
             if(currentNode->next == NULL) {
-            	//printf("No more memory available\n");
                 break;
             }
-            //printf("allouemem - Going to next node\n");
             currentNode = currentNode->next;
             currentBloc = currentNode->value;
         }
@@ -154,7 +150,7 @@ void freeMemory(bloc* bloc) {
 				if(rightNode != NULL) {
 					rightNode->previous = newNode;
 				}
-					root = newNode;
+				root = newNode;
 			// If next node only has no data,
 			// we want to merge current node with the next one
 			} else if(exist(node->next) && !hasData(node->next)) {
@@ -189,7 +185,7 @@ void freeMemory(bloc* bloc) {
 			if(node->next) {
 				node = node->next;
 			} else {
-				printf("wasn't able to change free the memory (didn't find the bloc)\n");
+				printf("Wasn't able to free the memory. Could not find block of memory!\n");
 			}
 			
 		}
@@ -274,45 +270,143 @@ bool byteIsAllocated(int byte) {
 			currentNode = currentNode->next;
 		}
 	}
-	printf("didn't find your bloc\n");
+	printf("Byte is not allocated\n");
 	return false;
 }
 
-void printContent() {
+node* findAvailableNodeByBlocSize(int blocSize){
+	node *currentNode = root;
+	while(currentNode != NULL) {
+		if (!hasData(currentNode)) {
+			bloc *currentBloc = currentNode->value;
+			if (currentBloc->size == blocSize)
+				return currentNode;
+		}
+		currentNode = currentNode->next;
+	}
+	return NULL;
+}
+
+// Affiche_etat_memoire
+void printMemoryState() {
+	printf("MEMORY STATE\n");
 	int nodeIndex = 0;
 	node *currentNode = root;
 	while(currentNode != NULL) {
-		printf("current adress = %p\n", currentNode);
 		printf("Current node : %d\n", nodeIndex);
+		printf("Address = %p\n", currentNode);
 		printf("Size : %d\n", currentNode->value->size);
 		printf("Offset : %d\n", currentNode->value->offset);
 		printf("HasData : %d\n", currentNode->value->data != NULL);
 
 		if(currentNode->previous != NULL) {
-			printf("current adress previous = %p\n", currentNode->previous);
-			printf("current adress previous next = %p\n", currentNode->previous->next);
+			printf("Address of previous node = %p\n", currentNode->previous);
+			printf("Next address of previous node = %p\n", currentNode->previous->next);
 		}
 		if(currentNode->next != NULL) {
-			printf("current adress next = %p\n", currentNode->next);
-			printf("current adress next previous = %p\n", currentNode->next->previous);
+			printf("Address of next node = %p\n", currentNode->next);
+			printf("Previous address of next node = %p\n", currentNode->next->previous);
 		}
-		printf("\n");
-		printf("\n");
+		printf("--------------------\n\n");
 
 		currentNode = currentNode->next;
 		nodeIndex++;
 	}
 }
 
-void main() {
-	initMemory(500);
+// Affiche_parametres_memoire
+void printMemoryParameters() {
+	printf("MEMORY PARAMETERS\n");
+	printf("Size of largest bloc of free memory : %d\n", sizeOfLargestBlocOfFreeMemory());
+	printf("Memory available : %d\n", availableMemory());
+	printf("Number of free blocs of memory : %d\n", nbFreeBlocs());
+	printf("Number of allocated blocs of memory : %d\n", nbAllocatedBlocs());
+	printf("Number of blocs of memory smaller than 100 : %d\n\n", nbFreeBlocsSmallerThan(100));
+}
 
-	bloc *allocationBloc = allocateMemory(100);
-	bloc *luiDuMilleu = allocateMemory(50);
-	bloc *asas = allocateMemory(100);
-	freeMemory(luiDuMilleu);
-	freeMemory(allocationBloc);
-	freeMemory(asas);
-	printContent();
+void firstFit() {
+	printf("START OF FIRST-FIT STRATEGY\n\n");
+	initMemory(500);
+	bloc* bloc0 = allocateMemory(100);
+	bloc* bloc1 = allocateMemory(100);
+	bloc* bloc2 = allocateMemory(100);
+	bloc* bloc3 = allocateMemory(100);
+	bloc* bloc4 = allocateMemory(100);
+	printMemoryState();
+	printMemoryParameters();
+
+	printf("FREEING MEMORY OF NODE 1\n\n");
+	freeMemory(bloc1);
+	printMemoryState();
+	printMemoryParameters();
+
+	printf("FREEING MEMORY OF NODE 3\n\n");
+	freeMemory(bloc3);
+	printMemoryState();
+	printMemoryParameters();
+
+	printf("FREEING MEMORY OF NODE 2\n\n");
+	freeMemory(bloc2);
+	printMemoryState();
+	printMemoryParameters();
+	printf("END OF FIRST-FIT STRATEGY\n");
+}
+
+void bestFit() {
+	printf("START OF BEST-FIT STRATEGY\n\n");
+	initMemory(600);
+	bloc* bloc0 = allocateMemory(100);
+	bloc* bloc1 = allocateMemory(100);
+	bloc* bloc2 = allocateMemory(100);
+	bloc* bloc3 = allocateMemory(100);
+	bloc* bloc4 = allocateMemory(100);
+	bloc* bloc5 = allocateMemory(100);
+	freeMemory(bloc2); // WHEN TRYING TO FREE bloc1 BEFORE bloc2,
+	freeMemory(bloc1); // SEGMENTATION FAULT
+	freeMemory(bloc4);
+	printMemoryState();
+	printMemoryParameters();
+
+	printf("END OF BEST-FIT STRATEGY\n");
+
+}
+
+void worstFit() {
+	printf("START OF WORST-FIT STRATEGY\n\n");
+	initMemory(500);
+	printMemoryState();
+	printMemoryParameters();
+	printf("END OF WORST-FIT STRATEGY\n");
+
+}
+
+void nextFit() {
+	printf("START OF NEXT-FIT STRATEGY\n\n");
+	initMemory(500);
+	printMemoryState();
+	printMemoryParameters();
+	printf("END OF NEXT-FIT STRATEGY\n");
+
+}
+
+void useAllocationStrategy(int strategyIndex) {
+	switch (strategyIndex) {
+		case 1:
+			bestFit();
+			break;
+		case 2:
+			worstFit();
+			break;
+		case 3:
+			nextFit();
+			break;
+		default:
+			firstFit();
+			break;
+	}
+}
+
+void main() {
+	useAllocationStrategy(0);
 }
 
