@@ -223,9 +223,6 @@ void testFreeMemoryWithEmptyRightLeft2() {
 }
 /////////////////////////////////////////////////////
 
-
-
-
 /////////////////////////////////////////////////////
 void testNbFreeBloc() {
 	initMemory(500);
@@ -291,12 +288,6 @@ void testIsByteAllocatedFALSE() {
 	assert(byteIsAllocated(212) == false);
 }
 /////////////////////////////////////////////////////
-
-
-
-
-
-
 
 void main() {
 	testInitMemory();

@@ -340,30 +340,39 @@ bool byteIsAllocated(int byte) {
 	return false;
 }
 
-void printContent() {
+// Affiche_etat_memoire
+void printMemoryState() {
+	printf("MEMORY STATE\n");
 	int nodeIndex = 0;
 	node *currentNode = root;
 	while(currentNode != NULL) {
-		printf("current adress = %p\n", currentNode);
 		printf("Current node : %d\n", nodeIndex);
+		printf("Address = %p\n", currentNode);
 		printf("Size : %d\n", currentNode->value->size);
 		printf("Offset : %d\n", currentNode->value->offset);
 		printf("HasData : %d\n", currentNode->value->data != NULL);
 
 		if(currentNode->previous != NULL) {
-			printf("current adress previous = %p\n", currentNode->previous);
-			printf("current adress previous next = %p\n", currentNode->previous->next);
+			printf("Address of previous node = %p\n", currentNode->previous);
+			printf("Next address of previous node = %p\n", currentNode->previous->next);
 		}
 		if(currentNode->next != NULL) {
-			printf("current adress next = %p\n", currentNode->next);
-			printf("current adress next previous = %p\n", currentNode->next->previous);
+			printf("Address of next node = %p\n", currentNode->next);
+			printf("Previous address of next node = %p\n", currentNode->next->previous);
 		}
-		printf("\n");
-		printf("\n");
+		printf("--------------------\n\n");
 
 		currentNode = currentNode->next;
 		nodeIndex++;
 	}
 }
 
-// shouldn't have a main since we use #include "this file"
+// Affiche_parametres_memoire
+void printMemoryParameters() {
+	printf("MEMORY PARAMETERS\n");
+	printf("Size of largest bloc of free memory : %d\n", sizeOfLargestBlocOfFreeMemory());
+	printf("Memory available : %d\n", availableMemory());
+	printf("Number of free blocs of memory : %d\n", nbFreeBlocs());
+	printf("Number of allocated blocs of memory : %d\n", nbAllocatedBlocs());
+	printf("Number of blocs of memory smaller than 100 : %d\n\n", nbFreeBlocsSmallerThan(100));
+}
