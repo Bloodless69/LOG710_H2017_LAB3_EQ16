@@ -81,11 +81,11 @@ bloc* allocateMemory(int blocSize) {
             }
         } else {
             if(currentNode->next == NULL) {
-<<<<<<< HEAD:main.c
-                break;
-=======
+<<<<<<< HEAD:manageMemoryPart1.c
                 return NULL;
->>>>>>> origin/done:manageMemoryPart1.c
+=======
+                break;
+>>>>>>> a5c1bf38455b9cab9622036f7eab1132e830025c:main.c
             }
             currentNode = currentNode->next;
             currentBloc = currentNode->value;
@@ -154,12 +154,12 @@ bool freeMemory(bloc* bloc) {
 				if(rightNode != NULL) {
 					rightNode->previous = newNode;
 				}
-<<<<<<< HEAD:main.c
-				root = newNode;
-=======
+<<<<<<< HEAD:manageMemoryPart1.c
 				if(node->previous == root)
 					root = newNode;
->>>>>>> origin/done:manageMemoryPart1.c
+=======
+				root = newNode;
+>>>>>>> a5c1bf38455b9cab9622036f7eab1132e830025c:main.c
 			// If next node only has no data,
 			// we want to merge current node with the next one
 			} else if(exist(node->next) && !hasData(node->next)) {
@@ -194,11 +194,11 @@ bool freeMemory(bloc* bloc) {
 			if(node->next) {
 				node = node->next;
 			} else {
-<<<<<<< HEAD:main.c
-				printf("Wasn't able to free the memory. Could not find block of memory!\n");
-=======
+<<<<<<< HEAD:manageMemoryPart1.c
 				return false;
->>>>>>> origin/done:manageMemoryPart1.c
+=======
+				printf("Wasn't able to free the memory. Could not find block of memory!\n");
+>>>>>>> a5c1bf38455b9cab9622036f7eab1132e830025c:main.c
 			}
 			
 		}
@@ -283,10 +283,10 @@ bool byteIsAllocated(int byte) {
 			currentNode = currentNode->next;
 		}
 	}
-<<<<<<< HEAD:main.c
-	printf("Byte is not allocated\n");
+<<<<<<< HEAD:manageMemoryPart1.c
 =======
->>>>>>> origin/done:manageMemoryPart1.c
+	printf("Byte is not allocated\n");
+>>>>>>> a5c1bf38455b9cab9622036f7eab1132e830025c:main.c
 	return false;
 }
 
@@ -330,7 +330,20 @@ void printMemoryState() {
 	}
 }
 
-<<<<<<< HEAD:main.c
+<<<<<<< HEAD:manageMemoryPart1.c
+// shouldn't have a main since we use #include "this file"
+/*
+void main() {
+	initMemory(500);
+	struct bloc *bloc = allocateMemory(100);
+	struct bloc *secondBloc = allocateMemory(100);
+	struct bloc *thirdBloc = allocateMemory(100);
+	freeMemory(bloc);
+	freeMemory(secondBloc);
+	//printContent();
+
+	struct node *nextNode = root->next;
+=======
 // Affiche_parametres_memoire
 void printMemoryParameters() {
 	printf("MEMORY PARAMETERS\n");
@@ -426,20 +439,7 @@ void useAllocationStrategy(int strategyIndex) {
 void main() {
 	useAllocationStrategy(0);
 }
-=======
-// shouldn't have a main since we use #include "this file"
-/*
-void main() {
-	initMemory(500);
-	struct bloc *bloc = allocateMemory(100);
-	struct bloc *secondBloc = allocateMemory(100);
-	struct bloc *thirdBloc = allocateMemory(100);
-	freeMemory(bloc);
-	freeMemory(secondBloc);
-	//printContent();
-
-	struct node *nextNode = root->next;
->>>>>>> origin/done:manageMemoryPart1.c
+>>>>>>> a5c1bf38455b9cab9622036f7eab1132e830025c:main.c
 
 	
 
