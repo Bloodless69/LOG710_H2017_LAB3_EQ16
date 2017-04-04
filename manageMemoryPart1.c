@@ -81,7 +81,11 @@ bloc* allocateMemory(int blocSize) {
             }
         } else {
             if(currentNode->next == NULL) {
+<<<<<<< HEAD:main.c
                 break;
+=======
+                return NULL;
+>>>>>>> origin/done:manageMemoryPart1.c
             }
             currentNode = currentNode->next;
             currentBloc = currentNode->value;
@@ -91,7 +95,7 @@ bloc* allocateMemory(int blocSize) {
 }
 
 // liberemem()
-void freeMemory(bloc* bloc) {
+bool freeMemory(bloc* bloc) {
 	node* node = root;
 	while(true) {
 		if (node->value == bloc)
@@ -139,7 +143,7 @@ void freeMemory(bloc* bloc) {
 				newBloc->offset = previousBloc->offset;
 				newBloc->data = NULL;
 
-				struct node* newNode;
+				struct node* newNode = malloc(sizeof(node));
 				newNode->value = newBloc;
 				newNode->previous = leftNode;
 				newNode->next = rightNode;
@@ -150,7 +154,12 @@ void freeMemory(bloc* bloc) {
 				if(rightNode != NULL) {
 					rightNode->previous = newNode;
 				}
+<<<<<<< HEAD:main.c
 				root = newNode;
+=======
+				if(node->previous == root)
+					root = newNode;
+>>>>>>> origin/done:manageMemoryPart1.c
 			// If next node only has no data,
 			// we want to merge current node with the next one
 			} else if(exist(node->next) && !hasData(node->next)) {
@@ -180,12 +189,16 @@ void freeMemory(bloc* bloc) {
 			} else {
 				node->value->data = NULL;
 			}
-			break;
+			return true;
 		} else {
 			if(node->next) {
 				node = node->next;
 			} else {
+<<<<<<< HEAD:main.c
 				printf("Wasn't able to free the memory. Could not find block of memory!\n");
+=======
+				return false;
+>>>>>>> origin/done:manageMemoryPart1.c
 			}
 			
 		}
@@ -235,10 +248,10 @@ int availableMemory() {
 int sizeOfLargestBlocOfFreeMemory() {
 	// Here we are assuming that the root always has a bloc of memory
 	node *currentNode = root;
-	int largestSize = currentNode->value->size;
+	int largestSize = 0;
 	while(currentNode != NULL) {
 		bloc *currentBloc = currentNode->value;
-		if (currentBloc->size > largestSize)
+		if (currentBloc->size > largestSize && currentBloc->data == NULL)
 			largestSize = currentBloc->size;
 		currentNode = currentNode->next;
 	}
@@ -251,7 +264,7 @@ int nbFreeBlocsSmallerThan(int blocSize) {
 	node *currentNode = root;
 	while(currentNode != NULL) {
 		bloc *currentBloc = currentNode->value;
-		if (currentBloc->size < blocSize)
+		if (currentBloc->size < blocSize && currentBloc->data == NULL)
 			nbSmallerFreeBlocs++;
 		currentNode = currentNode->next;
 	}
@@ -270,7 +283,10 @@ bool byteIsAllocated(int byte) {
 			currentNode = currentNode->next;
 		}
 	}
+<<<<<<< HEAD:main.c
 	printf("Byte is not allocated\n");
+=======
+>>>>>>> origin/done:manageMemoryPart1.c
 	return false;
 }
 
@@ -314,6 +330,7 @@ void printMemoryState() {
 	}
 }
 
+<<<<<<< HEAD:main.c
 // Affiche_parametres_memoire
 void printMemoryParameters() {
 	printf("MEMORY PARAMETERS\n");
@@ -409,4 +426,25 @@ void useAllocationStrategy(int strategyIndex) {
 void main() {
 	useAllocationStrategy(0);
 }
+=======
+// shouldn't have a main since we use #include "this file"
+/*
+void main() {
+	initMemory(500);
+	struct bloc *bloc = allocateMemory(100);
+	struct bloc *secondBloc = allocateMemory(100);
+	struct bloc *thirdBloc = allocateMemory(100);
+	freeMemory(bloc);
+	freeMemory(secondBloc);
+	//printContent();
 
+	struct node *nextNode = root->next;
+>>>>>>> origin/done:manageMemoryPart1.c
+
+	
+
+	struct node *emptyNode = nextNode->next;
+
+	
+}
+*/
